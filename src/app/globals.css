@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --color-brand-50: #eef3fb;
+  --color-brand-100: #dce6f5;
+  --color-brand-200: #b9cde9;
+  --color-brand-300: #8cadd8;
+  --color-brand-400: #5a86c2;
+  --color-brand-500: #3767ab;
+  --color-brand-600: #27518f;
+  --color-brand-700: #1c3f74;
+  --color-brand-800: #102c56;
+  --color-brand-900: #012169;
+  --color-brand-950: #001541;
+
+  --color-accent-50: #fdeef1;
+  --color-accent-100: #fbd5dc;
+  --color-accent-200: #f6a5b3;
+  --color-accent-300: #ef6f85;
+  --color-accent-400: #e83f5c;
+  --color-accent-500: #e31837;
+  --color-accent-600: #c0122c;
+  --color-accent-700: #9c0e24;
+  --color-accent-800: #7a0b1c;
+  --color-accent-900: #5c0815;
+
+  --color-surface: #ffffff;
+  --color-canvas: #f4f6fa;
+
+  --shadow-card: 0 1px 2px rgb(1 33 105 / 0.06), 0 1px 3px rgb(1 33 105 / 0.08);
+  --shadow-pop: 0 10px 30px -10px rgb(1 33 105 / 0.25);
+
+  --animate-fade-in: fade-in 0.25s ease-out both;
+  --animate-rise: rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: -400px 0;
+    }
+    to {
+      background-position: 400px 0;
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-canvas text-slate-800 antialiased;
+}
+
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-brand-500;
+}
+
+.skeleton {
+  @apply rounded-md bg-slate-200/80;
+  background-image: linear-gradient(
+    90deg,
+    rgb(226 232 240 / 0) 0,
+    rgb(248 250 252 / 0.9) 40%,
+    rgb(226 232 240 / 0) 80%
+  );
+  background-size: 400px 100%;
+  background-repeat: no-repeat;
+  animation: var(--animate-shimmer);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-slate-300;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
