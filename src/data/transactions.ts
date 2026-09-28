@@ -22,7 +22,7 @@ export interface RawTx {
 }
 
 export const OPENING_BALANCES: Record<string, Record<AccountKey, number>> = {
-  olson2428: { checking: 9210.0, savings: 17100.0, credit: 842.31 },
+  olson2428: { checking: -45790.0, savings: 17100.0, credit: 842.31 },
   Jojo_01: { checking: 7842.1, savings: 18250.0, credit: 968.42 },
   jojo_02: { checking: 4215.55, savings: 26480.9, credit: 612.3 },
 };
@@ -86,6 +86,7 @@ const OLSON_RAW: RawTx[] = [
   { d: 14, acct: "credit", desc: "THE COPPER FORK RESTAURANT", merchant: "THE COPPER FORK", cat: "Food", amt: 62.40, dir: "debit", type: "Purchase", method: "Credit card" },
   { d: 13, acct: "checking", desc: "LAKEVIEW MALL PURCHASE", merchant: "LAKEVIEW MALL", cat: "Shopping", amt: 145.80, dir: "debit", type: "Purchase", method: "Debit card" },
   { d: 12, acct: "checking", desc: "RIDESHARE EXPRESS TRIP", merchant: "RIDESHARE EXPRESS", cat: "Transportation", amt: 22.50, dir: "debit", type: "Purchase", method: "Debit card" },
+  { d: 11, acct: "checking", desc: "WIRE TRANSFER DEPOSIT", merchant: "INCOMING WIRE", cat: "Income", amt: 25000.00, dir: "credit", type: "Wire Transfer", status: "Posted", method: "Wire transfer" },
   { d: 11, acct: "checking", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 6.40, dir: "debit", type: "Purchase", method: "Debit card" },
   { d: 10, acct: "checking", desc: "MONTHLY MAINTENANCE FEE WAIVED CREDIT", merchant: "Bank of America", cat: "Fees", amt: 12.00, dir: "credit", type: "Fee Waiver", method: "Automatic" },
   { d: 10, acct: "credit", desc: "SPECTRUM INTERNET BILL", merchant: "SPECTRUM INTERNET", cat: "Utilities", amt: 89.99, dir: "debit", type: "Purchase", method: "Credit card" },
@@ -95,6 +96,7 @@ const OLSON_RAW: RawTx[] = [
   { d: 7, acct: "credit", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 44.27, dir: "debit", type: "Purchase", status: "Pending", method: "Credit card" },
   { d: 6, acct: "checking", desc: "TRANSFER TO PREMIER SAVINGS", merchant: "Bank of America", cat: "Transfers", amt: 600.00, dir: "debit", type: "Internal Transfer", status: "Completed", method: "Online transfer" },
   { d: 6, acct: "savings", desc: "TRANSFER FROM EVERYDAY CHECKING", merchant: "Bank of America", cat: "Transfers", amt: 600.00, dir: "credit", type: "Internal Transfer", status: "Completed", method: "Online transfer" },
+  { d: 5, acct: "checking", desc: "WIRE TRANSFER DEPOSIT", merchant: "INCOMING WIRE", cat: "Income", amt: 30000.00, dir: "credit", type: "Wire Transfer", status: "Posted", method: "Wire transfer" },
   { d: 5, acct: "checking", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 7.80, dir: "debit", type: "Purchase", method: "Debit card" },
   { d: 5, acct: "savings", desc: "MONTHLY INTEREST CREDIT", merchant: "Bank of America", cat: "Interest", amt: 23.54, dir: "credit", type: "Interest", status: "Completed", method: "Automatic" },
   { d: 4, acct: "checking", desc: "CROSSTOWN FUEL PURCHASE", merchant: "CROSSTOWN FUEL", cat: "Transportation", amt: 50.10, dir: "debit", type: "Purchase", method: "Debit card" },
