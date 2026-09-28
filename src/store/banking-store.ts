@@ -481,7 +481,7 @@ export const useBankingStore = create<BankingState>()(
       };
     },
     {
-      name: "boa-banking-v1",
+      name: "boa-banking-v2",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         currentUserId: state.currentUserId,

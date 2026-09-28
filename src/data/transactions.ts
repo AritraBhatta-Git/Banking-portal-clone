@@ -9,7 +9,12 @@ import { isoDaysFromToday } from "@/lib/formatters";
 export type AccountKey = "checking" | "savings" | "credit";
 
 export interface RawTx {
+  /** Days offset from today (positive = past).
+   *  Ignored when fixedDate is provided. */
   d: number;
+  /** Fixed ISO date YYYY-MM-DD. When present the transaction always appears
+   *  on this exact calendar date regardless of the real-world date. */
+  fixedDate?: string;
   acct: AccountKey;
   desc: string;
   merchant: string;
@@ -22,89 +27,43 @@ export interface RawTx {
 }
 
 export const OPENING_BALANCES: Record<string, Record<AccountKey, number>> = {
-  olson2428: { checking: -45790.0, savings: 17100.0, credit: 842.31 },
+  // olson2428: opening = 0 so the only transactions are the two deposits.
+  // Closing checking = $25,000 + $30,000 = $55,000.00
+  olson2428: { checking: 0, savings: 0, credit: 0 },
   Jojo_01: { checking: 7842.1, savings: 18250.0, credit: 968.42 },
   jojo_02: { checking: 4215.55, savings: 26480.9, credit: 612.3 },
 };
 
 // ---------------------------------------------------------------------------
-// Gary Olson (olson2428) — primary demo user
-// Target closing balances: checking ~$16,653.22 | savings ~$19,557.18 | credit ~$1,369.31
+// Gary Olson (olson2428) — two deposits only
 // ---------------------------------------------------------------------------
 const OLSON_RAW: RawTx[] = [
-  // ~70 days ago
-  { d: 72, acct: "checking", desc: "PINNACLE STAFFING DIRECT DEPOSIT", merchant: "PINNACLE STAFFING", cat: "Income", amt: 3820.50, dir: "credit", type: "Direct Deposit", method: "Direct deposit" },
-  { d: 70, acct: "checking", desc: "RIDGEWOOD PROPERTY MGMT RENT", merchant: "RIDGEWOOD PROPERTY MGMT", cat: "Housing", amt: 1750.00, dir: "debit", type: "ACH Payment", method: "ACH debit" },
-  { d: 69, acct: "credit", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 63.48, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 68, acct: "checking", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 91.14, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 67, acct: "credit", desc: "JETBLUE AIRFARE PURCHASE", merchant: "JETBLUE AIRWAYS", cat: "Transportation", amt: 314.00, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 66, acct: "checking", desc: "CAROLINAS POWER UTILITY PAYMENT", merchant: "CAROLINAS POWER", cat: "Utilities", amt: 124.60, dir: "debit", type: "Utility Payment", method: "Online bill pay" },
-  { d: 65, acct: "savings", desc: "MONTHLY INTEREST CREDIT", merchant: "Bank of America", cat: "Interest", amt: 22.18, dir: "credit", type: "Interest", status: "Completed", method: "Automatic" },
-  { d: 64, acct: "checking", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 7.25, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 63, acct: "credit", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 5.90, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 62, acct: "checking", desc: "STREAMLINE SUBSCRIPTION", merchant: "STREAMLINE", cat: "Subscriptions", amt: 17.99, dir: "debit", type: "Recurring Payment", method: "Debit card" },
-  { d: 61, acct: "credit", desc: "STREAMLINE SUBSCRIPTION", merchant: "STREAMLINE", cat: "Subscriptions", amt: 15.99, dir: "debit", type: "Recurring Payment", method: "Credit card" },
-  { d: 60, acct: "checking", desc: "CROSSTOWN FUEL PURCHASE", merchant: "CROSSTOWN FUEL", cat: "Transportation", amt: 52.30, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 59, acct: "credit", desc: "THE COPPER FORK RESTAURANT", merchant: "THE COPPER FORK", cat: "Food", amt: 74.80, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 58, acct: "checking", desc: "PINNACLE STAFFING DIRECT DEPOSIT", merchant: "PINNACLE STAFFING", cat: "Income", amt: 3820.50, dir: "credit", type: "Direct Deposit", method: "Direct deposit" },
-  { d: 56, acct: "checking", desc: "TRANSFER TO PREMIER SAVINGS", merchant: "Bank of America", cat: "Transfers", amt: 600.00, dir: "debit", type: "Internal Transfer", status: "Completed", method: "Online transfer" },
-  { d: 56, acct: "savings", desc: "TRANSFER FROM EVERYDAY CHECKING", merchant: "Bank of America", cat: "Transfers", amt: 600.00, dir: "credit", type: "Internal Transfer", status: "Completed", method: "Online transfer" },
-  { d: 54, acct: "checking", desc: "GREENLEAF GROCERS PURCHASE", merchant: "GREENLEAF GROCERS", cat: "Food", amt: 68.92, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 52, acct: "checking", desc: "CITY WATER UTILITY PAYMENT", merchant: "CITY WATER", cat: "Utilities", amt: 48.30, dir: "debit", type: "Utility Payment", method: "Online bill pay" },
-  { d: 51, acct: "credit", desc: "AMAZON MARKETPLACE PURCHASE", merchant: "AMAZON MARKETPLACE", cat: "Shopping", amt: 104.97, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 50, acct: "checking", desc: "THE COPPER FORK RESTAURANT", merchant: "THE COPPER FORK", cat: "Food", amt: 42.60, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 48, acct: "checking", desc: "LAKEVIEW MALL PURCHASE", merchant: "LAKEVIEW MALL", cat: "Shopping", amt: 89.50, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 47, acct: "credit", desc: "AMAZON MARKETPLACE REFUND", merchant: "AMAZON MARKETPLACE", cat: "Shopping", amt: 104.97, dir: "credit", type: "Refund", method: "Credit card" },
-  { d: 46, acct: "checking", desc: "RIDESHARE EXPRESS TRIP", merchant: "RIDESHARE EXPRESS", cat: "Transportation", amt: 26.40, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 45, acct: "credit", desc: "CROSSTOWN FUEL PURCHASE", merchant: "CROSSTOWN FUEL", cat: "Transportation", amt: 55.80, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 44, acct: "checking", desc: "PINNACLE STAFFING DIRECT DEPOSIT", merchant: "PINNACLE STAFFING", cat: "Income", amt: 3820.50, dir: "credit", type: "Direct Deposit", method: "Direct deposit" },
-  { d: 44, acct: "checking", desc: "ATM WITHDRAWAL 1247 RIDGEWOOD DR", merchant: "ATM 1247", cat: "Other", amt: 120.00, dir: "debit", type: "ATM Withdrawal", method: "ATM" },
-  { d: 42, acct: "checking", desc: "BEATWAVE MUSIC SUBSCRIPTION", merchant: "BEATWAVE MUSIC", cat: "Subscriptions", amt: 11.99, dir: "debit", type: "Recurring Payment", method: "Debit card" },
-  { d: 40, acct: "checking", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 97.44, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 40, acct: "credit", desc: "PRESTIGE HOME DECOR PURCHASE", merchant: "PRESTIGE HOME DECOR", cat: "Shopping", amt: 349.99, dir: "debit", type: "Purchase", status: "Declined", method: "Credit card" },
-  { d: 38, acct: "checking", desc: "LAKEVIEW MALL REFUND", merchant: "LAKEVIEW MALL", cat: "Shopping", amt: 89.50, dir: "credit", type: "Refund", method: "Debit card" },
-  { d: 38, acct: "credit", desc: "BEATWAVE MUSIC SUBSCRIPTION", merchant: "BEATWAVE MUSIC", cat: "Subscriptions", amt: 11.99, dir: "debit", type: "Recurring Payment", method: "Credit card" },
-  { d: 36, acct: "checking", desc: "CAROLINAS POWER UTILITY PAYMENT", merchant: "CAROLINAS POWER", cat: "Utilities", amt: 116.44, dir: "debit", type: "Utility Payment", method: "Online bill pay" },
-  { d: 35, acct: "savings", desc: "MONTHLY INTEREST CREDIT", merchant: "Bank of America", cat: "Interest", amt: 22.86, dir: "credit", type: "Interest", status: "Completed", method: "Automatic" },
-  { d: 34, acct: "checking", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 8.10, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 33, acct: "savings", desc: "MOBILE DEPOSIT CHECK 7721", merchant: "Mobile Deposit", cat: "Other", amt: 350.00, dir: "credit", type: "Deposit", status: "Completed", method: "Mobile deposit" },
-  { d: 32, acct: "checking", desc: "CREDIT CARD PAYMENT", merchant: "Bank of America", cat: "Payments", amt: 500.00, dir: "debit", type: "Card Payment", status: "Completed", method: "Online payment" },
-  { d: 32, acct: "credit", desc: "PAYMENT RECEIVED EVERYDAY CHECKING", merchant: "Bank of America", cat: "Payments", amt: 500.00, dir: "credit", type: "Card Payment", status: "Completed", method: "Online payment" },
-  { d: 30, acct: "checking", desc: "PINNACLE STAFFING DIRECT DEPOSIT", merchant: "PINNACLE STAFFING", cat: "Income", amt: 3820.50, dir: "credit", type: "Direct Deposit", method: "Direct deposit" },
-  { d: 29, acct: "checking", desc: "RIDGEWOOD PROPERTY MGMT RENT", merchant: "RIDGEWOOD PROPERTY MGMT", cat: "Housing", amt: 1750.00, dir: "debit", type: "ACH Payment", method: "ACH debit" },
-  { d: 28, acct: "checking", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 83.72, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 26, acct: "checking", desc: "STREAMLINE SUBSCRIPTION", merchant: "STREAMLINE", cat: "Subscriptions", amt: 17.99, dir: "debit", type: "Recurring Payment", method: "Debit card" },
-  { d: 24, acct: "checking", desc: "CROSSTOWN FUEL PURCHASE", merchant: "CROSSTOWN FUEL", cat: "Transportation", amt: 58.60, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 23, acct: "credit", desc: "JETBLUE BAGGAGE FEE", merchant: "JETBLUE AIRWAYS", cat: "Transportation", amt: 35.00, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 22, acct: "checking", desc: "MOBILE PAYMENT SENT", merchant: "Mobile Payment", cat: "Transfers", amt: 75.00, dir: "debit", type: "Mobile Payment", method: "Mobile payment" },
-  { d: 20, acct: "checking", desc: "GREENLEAF GROCERS PURCHASE", merchant: "GREENLEAF GROCERS", cat: "Food", amt: 77.36, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 19, acct: "credit", desc: "AMAZON MARKETPLACE PURCHASE", merchant: "AMAZON MARKETPLACE", cat: "Shopping", amt: 79.95, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 18, acct: "checking", desc: "THE COPPER FORK RESTAURANT", merchant: "THE COPPER FORK", cat: "Food", amt: 51.20, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 16, acct: "checking", desc: "PINNACLE STAFFING DIRECT DEPOSIT", merchant: "PINNACLE STAFFING", cat: "Income", amt: 3820.50, dir: "credit", type: "Direct Deposit", method: "Direct deposit" },
-  { d: 15, acct: "checking", desc: "CITY WATER UTILITY PAYMENT", merchant: "CITY WATER", cat: "Utilities", amt: 45.22, dir: "debit", type: "Utility Payment", method: "Online bill pay" },
-  { d: 14, acct: "checking", desc: "ATM WITHDRAWAL 1247 RIDGEWOOD DR", merchant: "ATM 1247", cat: "Other", amt: 80.00, dir: "debit", type: "ATM Withdrawal", method: "ATM" },
-  { d: 14, acct: "credit", desc: "THE COPPER FORK RESTAURANT", merchant: "THE COPPER FORK", cat: "Food", amt: 62.40, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 13, acct: "checking", desc: "LAKEVIEW MALL PURCHASE", merchant: "LAKEVIEW MALL", cat: "Shopping", amt: 145.80, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 12, acct: "checking", desc: "RIDESHARE EXPRESS TRIP", merchant: "RIDESHARE EXPRESS", cat: "Transportation", amt: 22.50, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 11, acct: "checking", desc: "WIRE TRANSFER DEPOSIT", merchant: "INCOMING WIRE", cat: "Income", amt: 25000.00, dir: "credit", type: "Wire Transfer", status: "Posted", method: "Wire transfer" },
-  { d: 11, acct: "checking", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 6.40, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 10, acct: "checking", desc: "MONTHLY MAINTENANCE FEE WAIVED CREDIT", merchant: "Bank of America", cat: "Fees", amt: 12.00, dir: "credit", type: "Fee Waiver", method: "Automatic" },
-  { d: 10, acct: "credit", desc: "SPECTRUM INTERNET BILL", merchant: "SPECTRUM INTERNET", cat: "Utilities", amt: 89.99, dir: "debit", type: "Purchase", method: "Credit card" },
-  { d: 9, acct: "checking", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 94.18, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 8, acct: "checking", desc: "BEATWAVE MUSIC SUBSCRIPTION", merchant: "BEATWAVE MUSIC", cat: "Subscriptions", amt: 11.99, dir: "debit", type: "Recurring Payment", method: "Debit card" },
-  { d: 7, acct: "checking", desc: "CAROLINAS POWER UTILITY PAYMENT", merchant: "CAROLINAS POWER", cat: "Utilities", amt: 131.82, dir: "debit", type: "Utility Payment", method: "Online bill pay" },
-  { d: 7, acct: "credit", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 44.27, dir: "debit", type: "Purchase", status: "Pending", method: "Credit card" },
-  { d: 6, acct: "checking", desc: "TRANSFER TO PREMIER SAVINGS", merchant: "Bank of America", cat: "Transfers", amt: 600.00, dir: "debit", type: "Internal Transfer", status: "Completed", method: "Online transfer" },
-  { d: 6, acct: "savings", desc: "TRANSFER FROM EVERYDAY CHECKING", merchant: "Bank of America", cat: "Transfers", amt: 600.00, dir: "credit", type: "Internal Transfer", status: "Completed", method: "Online transfer" },
-  { d: 5, acct: "checking", desc: "WIRE TRANSFER DEPOSIT", merchant: "INCOMING WIRE", cat: "Income", amt: 30000.00, dir: "credit", type: "Wire Transfer", status: "Posted", method: "Wire transfer" },
-  { d: 5, acct: "checking", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 7.80, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 5, acct: "savings", desc: "MONTHLY INTEREST CREDIT", merchant: "Bank of America", cat: "Interest", amt: 23.54, dir: "credit", type: "Interest", status: "Completed", method: "Automatic" },
-  { d: 4, acct: "checking", desc: "CROSSTOWN FUEL PURCHASE", merchant: "CROSSTOWN FUEL", cat: "Transportation", amt: 50.10, dir: "debit", type: "Purchase", method: "Debit card" },
-  { d: 3, acct: "checking", desc: "GREENLEAF GROCERS PURCHASE", merchant: "GREENLEAF GROCERS", cat: "Food", amt: 72.64, dir: "debit", type: "Purchase", status: "Pending", method: "Debit card" },
-  { d: 2, acct: "credit", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 8.95, dir: "debit", type: "Purchase", status: "Pending", method: "Credit card" },
-  { d: 1, acct: "checking", desc: "HARVEST MARKET PURCHASE", merchant: "HARVEST MARKET", cat: "Food", amt: 71.08, dir: "debit", type: "Purchase", status: "Pending", method: "Debit card" },
-  { d: 0, acct: "checking", desc: "SUMMIT COFFEE CO PURCHASE", merchant: "SUMMIT COFFEE CO", cat: "Food", amt: 9.45, dir: "debit", type: "Purchase", status: "Pending", method: "Debit card" },
-  { d: -4, acct: "checking", desc: "STREAMLINE SUBSCRIPTION", merchant: "STREAMLINE", cat: "Subscriptions", amt: 17.99, dir: "debit", type: "Recurring Payment", status: "Scheduled", method: "Debit card" },
+  {
+    d: 0,
+    fixedDate: "2026-09-17",
+    acct: "checking",
+    desc: "Deposit",
+    merchant: "Bank of America",
+    cat: "Income",
+    amt: 25000.00,
+    dir: "credit",
+    type: "Deposit",
+    status: "Posted",
+    method: "Wire transfer",
+  },
+  {
+    d: 0,
+    fixedDate: "2026-09-23",
+    acct: "checking",
+    desc: "Deposit",
+    merchant: "Bank of America",
+    cat: "Income",
+    amt: 30000.00,
+    dir: "credit",
+    type: "Deposit",
+    status: "Posted",
+    method: "Wire transfer",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -267,26 +226,37 @@ export function buildTransactions(userId: string): {
 } {
   const raw = RAW_BY_USER[userId] ?? [];
   const opening = OPENING_BALANCES[userId] ?? { checking: 0, savings: 0, credit: 0 };
-  const indexed = raw.map((r, i) => ({ r, i, date: isoDaysFromToday(r.d) }));
+
+  // Resolve each raw entry to an absolute ISO date string.
+  // If fixedDate is supplied, use it directly (guarantees exact calendar date).
+  // Otherwise compute from today offset so the demo always looks "recent".
+  const indexed = raw.map((r, i) => ({
+    r,
+    i,
+    date: r.fixedDate
+      ? `${r.fixedDate}T00:00:00.000Z`
+      : isoDaysFromToday(r.d),
+  }));
+
+  // Sort oldest → newest so the running balance accumulates correctly.
   indexed.sort((a, b) => (a.date === b.date ? a.i - b.i : a.date < b.date ? -1 : 1));
 
   const running: Record<AccountKey, number> = { ...opening };
+
   const transactions: Transaction[] = indexed.map(({ r, i, date }) => {
     const posted =
       r.status === undefined || r.status === "Posted" || r.status === "Completed";
+
     let balanceAfter = round2(running[r.acct]);
     if (posted) {
       const delta =
         r.acct === "credit"
-          ? r.dir === "debit"
-            ? r.amt
-            : -r.amt
-          : r.dir === "credit"
-            ? r.amt
-            : -r.amt;
+          ? r.dir === "debit" ? r.amt : -r.amt
+          : r.dir === "credit" ? r.amt : -r.amt;
       running[r.acct] = round2(running[r.acct] + delta);
       balanceAfter = running[r.acct];
     }
+
     return {
       id: `${userId}-tx-${String(i + 1).padStart(3, "0")}`,
       userId,
@@ -305,6 +275,7 @@ export function buildTransactions(userId: string): {
     };
   });
 
+  // Return newest-first for all display consumers.
   transactions.sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1));
   return { transactions, closing: running };
 }
